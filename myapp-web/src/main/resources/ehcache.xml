@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache name="spring-cache" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://ehcache.org/ehcache.xsd">
+    <!--
+            maxElementsInMemory涓虹紦瀛樺璞＄殑鏈�澶ф暟鐩�,
+            eternal璁剧疆鏄惁姘歌繙涓嶈繃鏈�,
+            timeToIdleSeconds瀵硅薄澶勪簬绌洪棽鐘舵�佺殑鏈�澶氱鏁�,
+            timeToLiveSeconds瀵硅薄澶勪簬缂撳瓨鐘舵�佺殑鏈�澶氱鏁�
+     -->
+    <diskStore path="java.io.tmpdir"/>
+    <transactionManagerLookup class="net.sf.ehcache.transaction.manager.DefaultTransactionManagerLookup"
+                              properties="jndiName=java:/TransactionManager" propertySeparator=";"/>
+    <cacheManagerEventListenerFactory class="" properties=""/>
+    <defaultCache
+            maxElementsInMemory="100"
+            eternal="false"
+            timeToIdleSeconds="120"
+            timeToLiveSeconds="120"
+            overflowToDisk="true"
+            diskSpoolBufferSizeMB="30"
+            maxElementsOnDisk="100"
+            diskPersistent="false"
+            diskExpiryThreadIntervalSeconds="120"
+            memoryStoreEvictionPolicy="LRU"
+            statistics="false"
+            />
+</ehcache>

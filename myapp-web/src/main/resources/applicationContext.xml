@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+      http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd
+
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+
+       http://www.springframework.org/schema/tx
+      http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+    <context:component-scan base-package="com.dddpeter.myapp.**.*"/>
+    <bean id="mainConfigure"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:database.properties</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 鏁版嵁婧愰厤缃� -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+        <property name="driverClass" value="${DRIVER}"/>
+        <property name="jdbcUrl" value="${JDBC_URL}"/>
+        <property name="user" value="${USER}"/>
+        <property name="password" value="${PASSWORD}"/>
+        <!-- c3p0杩炴帴姹犻厤缃� -->
+        <!-- 鑾峰彇connnection鏃舵祴璇曟槸鍚︽湁鏁�  -->
+        <property name="testConnectionOnCheckin" value="false"/>
+        <!-- 鑷姩娴嬭瘯鐨則able鍚嶇О -->
+        <property name="automaticTestTable" value="C3P0TestTable"/>
+        <!-- set to something much less than wait_timeout, prevents connections from going stale -->
+        <property name="idleConnectionTestPeriod" value="18000 "/>
+        <!-- set to something slightly less than wait_timeout, preventing 'stale' connections from being handed out -->
+        <property name="maxIdleTime" value="25000"/>
+        <!-- if you can take the performance 'hit', set to "true" -->
+        <property name="testConnectionOnCheckout" value="true"/>
+    </bean>
+    <!-- Hibernate閰嶇疆 -->
+    <bean id="sessionFactory"
+          class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">false</prop>
+                <prop key="hibernate.current_session_context_class">
+                    org.springframework.orm.hibernate4.SpringSessionContext
+                </prop>
+                <prop key="hibernate.cache.region.factory_class">
+                    org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+                </prop>
+                <prop key="hibernate.cache.provider_configuration_file_resource_path">classpath:ehcache.xml</prop>
+                <prop key="hibernate.cache.use_query_cache">true</prop>
+                <prop key="hibernate.cache.use_second_level_cache">true</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.cache.region.factory_class">
+                    org.hibernate.cache.ehcache.EhCacheRegionFactory
+                </prop>
+                <prop key="hibernate.ca"></prop>
+            </props>
+        </property>
+        <property name="packagesToScan">
+            <list>
+                <value>com.dddpeter.myapp.**.po</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 事务管理器配置,单数据源事务 -->
+    <bean id="transactionManager"
+          class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory" />
+        </property>
+    </bean>
+    <tx:annotation-driven transaction-manager="transactionManager" />
+</beans>
